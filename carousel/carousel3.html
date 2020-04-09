@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .nomargin {
+      margin-right: 0 !important;
+    }
+
+    .carousel {
+      width: 560px;
+      height: 300px;
+      margin: 100px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel .m_unit {
+      width: 9999px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .carousel .m_unit ul {
+      list-style: none;
+      overflow: hidden;
+    }
+
+    .carousel .m_unit ul li {
+      float: left;
+    }
+
+    .carousel .m_unit ul li a {
+      display: block;
+      font-size: 0;
+    }
+
+    .btns a {
+      position: absolute;
+      top: 50%;
+      margin-top: -25px;
+      font-size: 20px;
+      width: 20px;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      text-decoration: none;
+      background-color: rgba(255, 255, 255, 0.6);
+      border-radius: 5px;
+      cursor: pointer;
+      color: #111
+    }
+
+    .btns a:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .btns .left_btn {
+      left: 5px
+    }
+
+    .btns .right_btn {
+      right: 5px
+    }
+
+    .circles {
+      position: absolute;
+      left: 50%;
+      margin-left: -45px;
+      bottom: 10px;
+    }
+
+    .circles ol {
+      list-style: none;
+      overflow: hidden
+    }
+
+    .circles ol li {
+      float: left;
+      background-color: #ccc;
+      width: 10px;
+      height: 10px;
+      margin-right: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .circles ol li.cur {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <div class="m_unit" id="m_unit">
+      <ul class="img_list" id="img_list">
+        <li><a href="javascript:;"><img src="images/0.jpg" alt=""></a></li>
+        <li><a href="javascript:;"><img src="images/1.jpg" alt=""></a></li>
+        <li><a href="javascript:;"><img src="images/2.jpg" alt=""></a></li>
+        <li><a href="javascript:;"><img src="images/3.jpg" alt=""></a></li>
+        <li><a href="javascript:;"><img src="images/4.jpg" alt=""></a></li>
+      </ul>
+    </div>
+    <div class="btns">
+      <a href="javascript:;" class="left_btn" id="left_btn">&lt;</a>
+      <a href="javascript:;" class="right_btn" id="right_btn">&gt;</a>
+    </div>
+    <div class="circles" id="circles">
+      <ol>
+        <li class="cur"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li class="nomargin"></li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="../fetchStyle.js"></script>
+  <script src="../animate.js"></script>
+  <script>
+    //获得元素
+    var mUnit = document.getElementById('m_unit'),
+        imgList = document.getElementById('img_list'),
+        lis = imgList.getElementsByTagName('li'),
+        leftBtn = document.getElementById('left_btn'),
+        rightBtn = document.getElementById('right_btn'),
+        circles = document.getElementById('circles').getElementsByTagName('li'),
+        idx = 0 //信号量
+
+    
+
+    for (var i = 0; i < circles.length; i++) {
+      (function(i) {
+        circles[i].onclick = function () {
+          idx = i
+          animate(mUnit, { left: -idx * 560 }, 600)
+          changeCir()
+        }
+      })(i)
+    }
+    
+    function changeCir() {
+      for (var i = 0; i < circles.length; i++) {
+        circles[i].className = ''
+      }
+      circles[idx].className = 'cur'
+      if (idx === 4) {
+        circles[idx].className += ' nomargin'
+      }
+    }
+  </script>
+</body>

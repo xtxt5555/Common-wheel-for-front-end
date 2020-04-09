@@ -21,7 +21,6 @@
     }
 
     .carousel .m_unit {
-      width: 9999px;
       position: absolute;
       top: 0;
       left: 0;
@@ -29,11 +28,17 @@
 
     .carousel .m_unit ul {
       list-style: none;
-      overflow: hidden;
     }
 
     .carousel .m_unit ul li {
-      float: left;
+      /* float: left; */
+      position: absolute;
+      left: 560px;
+      top: 0;
+    }
+
+    .carousel .m_unit ul li.first {
+      left: 0
     }
 
     .carousel .m_unit ul li a {
@@ -100,7 +105,7 @@
   <div class="carousel">
     <div class="m_unit" id="m_unit">
       <ul class="img_list" id="img_list">
-        <li><a href="javascript:;"><img src="images/0.jpg" alt=""></a></li>
+        <li class="first"><a href="javascript:;"><img src="images/0.jpg" alt=""></a></li>
         <li><a href="javascript:;"><img src="images/1.jpg" alt=""></a></li>
         <li><a href="javascript:;"><img src="images/2.jpg" alt=""></a></li>
         <li><a href="javascript:;"><img src="images/3.jpg" alt=""></a></li>
@@ -134,14 +139,72 @@
         circles = document.getElementById('circles').getElementsByTagName('li'),
         idx = 0 //信号量
 
-    
+    function rightBtnHandler() {
+      if (lis[idx].isAnimated) return
+
+      //当前图片直接左移
+      animate(lis[idx], {left: -560}, 600)
+
+
+      //下一张图片先就位再左移
+      idx++
+      if (idx > 4) {
+        idx = 0
+      }
+
+      lis[idx].style.left = 560 + 'px'
+
+      animate(lis[idx], { left: 0 }, 600, function () {
+        changeCir()
+      })
+    }
+
+    rightBtn.onclick = rightBtnHandler
+
+    leftBtn.onclick = function() {
+      //当前图片直接右移
+      animate(lis[idx], { left: 560 }, 600)
+
+
+      //下一张图片先就位再右移
+      idx--
+      if (idx < 0) {
+        idx = 4
+      }
+
+      lis[idx].style.left = -560 + 'px'
+
+      animate(lis[idx], { left: 0 }, 600, function () {
+        changeCir()
+      })
+    }
 
     for (var i = 0; i < circles.length; i++) {
       (function(i) {
         circles[i].onclick = function () {
-          idx = i
-          animate(mUnit, { left: -idx * 560 }, 600)
-          changeCir()
+          if (idx === i) {
+            return
+          } else if (idx > i) {//说明点击的图片在左侧
+            //当前图片直接右移
+            animate(lis[idx], { left: 560 }, 600)
+
+            //点击的图片先就位再右移
+            idx = i
+            lis[idx].style.left = -560 + 'px'
+            animate(lis[idx], {left: 0}, 600, function() {
+              changeCir()
+            })
+          } else {//说明点击的图片在右侧
+            //当前图片直接左移
+            animate(lis[idx], { left: -560 }, 600)
+            
+            //点击图片先就位再左移
+            idx = i
+            lis[idx].style.left = 560 + 'px'
+            animate(lis[idx], { left: 0 }, 600, function () {
+              changeCir()
+            })
+          }
         }
       })(i)
     }

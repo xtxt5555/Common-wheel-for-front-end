@@ -168,8 +168,9 @@
       (function(i) {
         circles[i].onclick = function () {
           idx = i
-          animate(mUnit, { left: -idx * 560 }, 600)
-          changeCir()
+          animate(mUnit, { left: -idx * 560 }, 600, function() {
+            changeCir()
+          })
         }
       })(i)
     }

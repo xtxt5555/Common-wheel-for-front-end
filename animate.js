@@ -45,21 +45,11 @@ function animate(ele, tarJSON, duration, tweenStr, callback) {
     begJSON[k] = parseFloat(fetchStyle(ele, k))
     delJSON[k] = tarJSON[k] - begJSON[k]
   }
-  console.log(begJSON, delJSON);
-  
 
   clearInterval(timer)
 
   timer = setInterval(function() {
-
-    //判断动画是否完成
-    if (frameNum === maxFrame) {
-      clearInterval(timer)
-      delete(ele.isAnimated)
-      callback && callback()
-      return
-    }
-
+    frameNum++
     for (var k in tarJSON) {
       //处理opacity
       if (k === 'opacity') {
@@ -69,7 +59,20 @@ function animate(ele, tarJSON, duration, tweenStr, callback) {
       }
     }
 
-    frameNum++
+    //判断动画是否完成
+    if (frameNum === maxFrame) {
+      clearInterval(timer)
+      for (var k in tarJSON) {
+        if (k === 'opacity') {
+          ele.style[k] = tarJSON
+        } else {
+          ele.style[k] = tarJSON + 'px'
+        }
+      }
+      delete ele.isAnimated
+      callback && callback()
+      return
+    }
   }, interval)
 
   var Tween = {

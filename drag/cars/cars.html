@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .cars {
+      width: 550px;
+      height: 438px;
+      margin: 100px;
+      position: relative;
+    }
+
+    .cars .image_list {
+      height: 412px;
+      list-style: none;
+    }
+
+    .cars .image_list li {
+      display: none;
+    }
+
+    .cars .image_list li.cur {
+      display: block;
+    }
+
+    .cars .slide {
+      width: 403px;
+      height: 26px;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      margin-left: -202px;
+      background: url(images/car_pic_ctr.png)  0 -26px;
+      -webkit-user-select:none;
+    }
+
+    .cars .slide .left {
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding-left: 18px;
+      height: 100%;
+      background: url(images/car_pic_ctr.png) no-repeat 0 0;
+      font-size: 12px;
+      line-height: 26px;
+    }
+
+    .cars .slide .right {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding-right: 18px;
+      height: 100%;
+      background: url(images/car_pic_ctr.png) no-repeat 23px -78px;
+      font-size: 12px;
+      line-height: 26px;
+    }
+
+    .cars .slide .track {
+      position: absolute;
+      top: 0;
+      left: 48px;
+      width: 300px;
+      height: 26px;
+      background: url(images/car_pic_ctr.png) 0 -52px;
+    }
+
+    .cars .slide .track .bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 21px;
+      height: 26px;
+      background: url(images/car_pic_ctr.png) no-repeat 0 -104px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cars">
+    <ul class="image_list" id="image_list">
+      <li class="cur"><img src="images/550x412_AE2UUEMQ297B0008.jpg" alt=""></li>
+      <li><img src="images/550x412_AE2UUF9J297B0008.jpg" alt=""></li>
+      <li><img src="images/550x412_AE2UUF24297B0008.jpg" alt=""></li>
+      <li><img src="images/550x412_AE2UUFI9297B0008.jpg" alt=""></li>
+      <li><img src="images/550x412_AE2UUFQB297B0008.jpg" alt=""></li>
+    </ul>
+    <div class="slide">
+      <span class="left">0&deg;</span>
+      <span class="track" id="track">
+        <span class="bar" id="bar"></span>
+      </span>
+      <span class="right">180&deg;</span>
+    </div>
+  </div>
+
+  <script>
+    var bar = document.getElementById('bar'),
+        track = document.getElementById('track'),
+        imageList = document.getElementById('image_list'),
+        lis = imageList.getElementsByTagName('li'),
+        nowIdx = 0,
+        step = (track.clientWidth - bar.clientWidth) / 4
+
+    // 滑动业务
+    bar.onmousedown = function(eve) {
+      eve = eve || window.eve
+      var delta = eve.clientX - bar.offsetLeft
+      
+
+      document.onmousemove = function(eve) {
+        eve = eve || window.eve
+        var x = eve.clientX - delta
+        //验收
+        if (x < 0) {
+          x = 0
+        } else if (x > track.clientWidth - bar.clientWidth) {
+          x = track.clientWidth - bar.clientWidth
+        }
+
+        idx = parseInt(x / step)
+        x = idx * step
+
+        // 防止DOM操作积累
+        if (idx !== nowIdx) {
+          nowIdx = idx
+          //操作DOM
+          bar.style.left = x + 'px'
+          
+          //改变显示图片
+          for (var i = 0; i < lis.length; i++) {
+            lis[i].className = ''
+          }
+          lis[nowIdx].className = 'cur'
+        }
+        return false
+      }
+    }
+
+    document.onmouseup = function() {
+      document.onmousemove = null
+    }
+
+    // 点击业务
+    // 获取点击位置
+    track.onclick = function(eve) {
+      eve = eve || window.event
+      // var pos = eve.offsetX,
+      var pos = eve.clientX - getAllLeft(track),
+          idx  = Math.floor((pos - (step / 2)) / step) + 1,
+          x = idx * step
+
+      if (idx !== nowIdx) {
+        nowIdx = idx
+        //操作DOM
+        bar.style.left = x + 'px'
+
+        //改变显示图片
+        for (var i = 0; i < lis.length; i++) {
+          lis[i].className = ''
+        }
+        lis[nowIdx].className = 'cur'
+      }
+
+    }
+
+    function getAllLeft(obj) {
+      var count = 0
+
+      while (obj) {
+        count += obj.offsetLeft
+        obj = obj.offsetParent
+      }
+
+      return count
+    }
+  </script>
+</body>

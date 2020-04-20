@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    p {
+      width: 150px;
+    }
+
+    .zoom {
+      width: 350px;
+      height: 350px;
+      border: 1px solid #ccc;
+      margin: 100px;
+      position: relative;
+    }
+
+    .zoom .mask {
+      width: 150px;
+      height: 150px;
+      background-color: yellow;
+      opacity: 0.5;
+      position: absolute;
+      left: 50px;
+      top: 50px;
+      display: none;
+      cursor: move;
+    }
+
+    .zoom .big_pic {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ccc;
+      position: absolute;
+      left: 350px;
+      top: 0;
+      background: url(images/da.jpg) no-repeat 0 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <p>
+    woda dafads sadfs dsd fasdf asd 
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd 
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd 
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd 
+    woda dafads sadfs dsd fasdf asd
+
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+    woda dafads sadfs dsd fasdf asd
+  </p>
+  <div class="zoom" id="zoom">
+    <div class="pic" id="pic">
+      <img src="images/xiao.jpg" alt="">
+      <div class="mask" id="mask"></div>
+    </div>
+    
+    <div class="big_pic" id="big_pic"></div>
+  </div>
+  
+  <script>
+    var zoom = document.getElementById('zoom'),
+        mask = document.getElementById('mask'),
+        bigPic = document.getElementById('big_pic'),
+        pic = document.getElementById('pic'),
+        maskWidth
+        
+        
+    mask.style.display = 'block'
+    maskWidth = mask.clientWidth
+    mask.style.display = 'none'
+
+    var rate = (pic.clientWidth - maskWidth) / (800 - 300)
+    pic.onmouseover = function(eve) {
+      eve = eve || window.event
+      // 显示放大镜
+      mask.style.display = 'block'
+      // 显示大图
+      bigPic.style.display = 'block'
+
+      pic.onmousemove = function(eve) {
+        eve = eve || window.event
+        var scrollTop = document.body.scrollTop || document.documentElement.scrollTop,
+        x = eve.clientX - zoom.offsetLeft - 75
+        y = eve.clientY - (getAllTop(pic) - scrollTop) -75
+
+        if (x < 0) {
+          x = 0
+        } else if (x > pic.clientWidth - mask.clientWidth) {
+          x = pic.clientWidth - mask.clientWidth
+        }
+
+        if (y < 0) {
+          y = 0
+        } else if (y > pic.clientHeight - mask.clientHeight) {
+          y = pic.clientHeight - mask.clientHeight
+        }
+        
+        mask.style.left = x + 'px'
+        mask.style.top = y + 'px'
+        bigPic.style.backgroundPositionX = - x / rate + 'px'
+        bigPic.style.backgroundPositionY = - y / rate + 'px'
+      }
+    }
+
+    pic.onmouseout = function() {  
+      // 隐藏放大镜
+      mask.style.display = 'none'
+      // 隐藏大图
+      bigPic.style.display = 'none'
+
+      pic.onmousemove = null
+    }
+
+    function getAllTop(ele) {
+      var count = 0
+      while (ele) {
+        count += ele.offsetTop
+        ele = ele.offsetParent
+      }
+      return count
+    }
+  </script>
+</body>

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .images {
+      width: 500px;
+      height: 125px;
+      padding: 0 20px;
+      margin: 100px;
+      position: relative;
+      border: 1px solid #ccc
+    }
+
+    .images .btns a {
+      position: absolute;
+      height: 65px;
+      width: 20px;
+      top: 50%;
+      margin-top: -33px;
+    }
+
+    .images .btns .left_btn {
+      left: 0;
+      background: url(images/bg05.png) no-repeat 0 0;
+    }
+
+    .images .btns .right_btn {
+      right: 0;
+      background: url(images/bg05.png) no-repeat -42px 0;
+    }
+
+    .images .image_list {
+      padding: 5px 0;
+      height: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .images .image_list ul {
+      width: 9999px;
+      height: 100%;
+      list-style: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .images .image_list ul li {
+      float: left;
+      margin-right: 5px;
+    }
+
+    .images .image_list ul li img {
+      height: 100px;
+    }
+
+    .images .slide {
+      height: 15px;
+      width: 100%;
+      background-color: #000;
+      position: relative;
+    }
+
+    .images .slide .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 15px;
+      /* width: 100px; */
+      background: url(images/bg07.png) 0 -32px;
+    }
+
+    .images .slide .bar .left,.images .slide .bar .right {
+      position: absolute;
+      top: 0;
+      width: 10px;
+      height: 100%;
+    }
+
+    .images .slide .bar .left {
+      left: 0;
+      background: url(images/bg07.png) no-repeat;
+    }
+
+    .images .slide .bar .right {
+      right: 0;
+      background: url(images/bg07.png) no-repeat -26px 0;
+    }
+
+    .images .slide .bar .middle {
+      position: absolute;
+      top: 0;
+      width: 16px;
+      height: 100%;
+      background: url(images/bg07.png) no-repeat -10px 0;
+      left: 50%;
+      margin-left: -8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="images">
+    <div class="btns">
+      <a href="javascript:;" class="left_btn" id="left_btn"></a>
+      <a href="javascript:;" class="right_btn" id="right_btn"></a>
+    </div>
+    <div class="image_list">
+      <ul id="m_unit">
+        <li><img src="../../carousel/images/0.jpg" alt=""></li>
+        <li><img src="../../carousel/images/1.jpg" alt=""></li>
+        <li><img src="../../carousel/images/2.jpg" alt=""></li>
+        <li><img src="../../carousel/images/3.jpg" alt=""></li>
+        <li><img src="../../carousel/images/4.jpg" alt=""></li>
+      </ul>
+    </div>
+    <div class="slide" id="slide">
+      <span class="bar" id="bar">
+        <span class="left"></span>
+        <span class="right"></span>
+        <span class="middle"></span>
+      </span>
+    </div>
+  </div>
+  <script>
+    var bar = document.getElementById('bar'),
+        slideLength = document.getElementById('slide').clientWidth,
+        mUnit = document.getElementById('m_unit'),
+        leftBtn = document.getElementById('left_btn'),
+        rightBtn = document.getElementById('right_btn'),
+        barLength = slideLength * 500 / (187 * 5 + 5 * 4),
+        rate = (slideLength - barLength) / (187 * 5 + 5 * 4 - 500),
+        nowLeft = 0
+
+    bar.style.width = barLength + 'px'
+    bar.onmousedown = function(eve) {
+      eve = eve || window.event
+      var delta = eve.clientX - bar.offsetLeft
+      document.onmousemove = function(eve) {
+        eve = eve || window.event
+        eve.preventDefault()
+        nowLeft = eve.clientX - delta
+        if (nowLeft < 0) {
+          nowLeft = 0
+        } else if (nowLeft > slideLength - barLength) {
+          nowLeft = slideLength - barLength
+        }
+        bar.style.left = nowLeft + 'px'
+        mUnit.style.left = - nowLeft / rate + 'px'
+      }
+    }
+
+    document.onmouseup = function() {
+      document.onmousemove = null
+    }
+
+    leftBtn.onclick = function() {
+      nowLeft -= 20
+      if (nowLeft < 0) {
+        nowLeft = 0
+      }
+      bar.style.left = nowLeft + 'px'
+      mUnit.style.left = - nowLeft / rate + 'px'
+    }
+
+    rightBtn.onclick = function() {
+      nowLeft += 20
+      if (nowLeft > slideLength - barLength) {
+        nowLeft = slideLength - barLength
+      }
+      bar.style.left = nowLeft + 'px'
+      mUnit.style.left = - nowLeft / rate + 'px'
+    }
+  </script>
+</body>

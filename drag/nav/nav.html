@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 500px;
+      overflow: auto;
+    }
+
+    .container {
+      width: 800px;
+      margin: 0 auto;
+    }
+
+    .side {
+      position: fixed;
+      width: 100px;
+      top: 50%;
+      left: 70px;
+    }
+
+    .side ul {
+      list-style: none;
+      background-color: skyblue;
+    }
+
+    .side ul li {
+      font-size: 16px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      cursor: pointer
+    }
+
+    .side ul li.cur {
+      background-color: rgba(111,111,111,0.5)
+    }
+
+    .container div {
+      margin-bottom: 25px;
+    }
+
+    .container .fl1 {
+      height: 300px;
+      background-color: yellow;
+    }
+
+    .container .fl2 {
+      height: 153px;
+      background-color: blue;
+    }
+
+    .container .fl3 {
+      height: 411px;
+      background-color: green;
+    }
+
+    .container .fl4 {
+      height: 163px;
+      background-color: pink;
+    }
+
+    .container .fl5 {
+      height: 219px;
+      background-color: orange;
+    }
+
+    .container .fl6 {
+      height: 444px;
+      background-color: yellowgreen;
+    }
+
+    .container .fl7 {
+      height: 367px;
+      background-color: hotpink;
+    }
+
+    .container .header {
+      height: 200px;
+    }
+
+    .container .footer {
+      height: 450px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">head</div>
+    <div class="fl1">服装</div>
+    <div class="fl2">鞋子</div>
+    <div class="fl3">化妆</div>
+    <div class="fl4">电子</div>
+    <div class="fl5">教育</div>
+    <div class="fl6">美食</div>
+    <div class="fl7">游戏</div>
+    <div class="footer">bottom</div>
+  </div>
+  <div class="side">
+    <ul>
+      <li class="cur">服装</li>
+      <li>鞋子</li>
+      <li>化妆品</li>
+      <li>电子</li>
+      <li>教育</li>
+      <li>美食</li>
+      <li>游戏</li>
+    </ul>
+  </div>
+
+  <script>
+    // 获得所有楼层的起始高度
+    var divs = document.getElementsByTagName('div'),
+        fls = [],
+        lis = document.getElementsByTagName('li')
+        heightArr = [],
+        idx = NaN
+
+    for (var i = 0; i < divs.length; i++) {
+      if (divs[i].className.indexOf('fl') !== -1) {
+        fls.push(divs[i])
+        heightArr.push(divs[i].offsetTop)
+      }
+    }
+
+  changeFl()
+
+  var len = heightArr.length
+  heightArr.push(fls[fls.length - 1].clientHeight + heightArr[heightArr.length - 1])
+  
+  window.onscroll = function() {
+    var scrollTop = document.body.scrollTop 
+    scrollTop = Math.round(scrollTop)
+    // 判断当前楼层
+    for (var i =0; i < len; i++) {
+      if (scrollTop >= heightArr[i] && scrollTop < heightArr[i + 1]) {
+        console.log(scrollTop, heightArr[i], heightArr[i + 1]);
+        idx = i
+        changeFl()
+        break
+      }
+    }
+
+    // 没有找到楼层时
+    if (i === len) {
+      idx = NaN
+      changeFl()
+    }
+  }
+
+  for (i = 0; i < lis.length; i++) {
+    (function(i) {
+      lis[i].onclick = function() {
+        scrollAnimate(heightArr[i], 300)
+      }
+    })(i)
+
+    // lis[i].onmousedown = function() {
+    //   return false
+    // }
+  }
+  
+  function changeFl() {
+    for (var i = 0; i < len; i++) {
+      lis[i].className = ''
+    }
+    !Number.isNaN(idx) && (lis[idx].className = 'cur')
+  }
+  
+  function scrollAnimate(tar, duration) {
+    var cur = document.body.scrollTop,
+        interval = 16, //60fps
+        totalFrames = Math.ceil(duration / interval),
+        delta = tar - cur,
+        frame = 0,
+        timer
+    
+    clearInterval(timer)
+
+    timer = setInterval(function() {
+      if (frame === totalFrames) {
+        // document.body.scrollTop = document.documentElement.scrollTop = tar
+        clearInterval(timer)
+      } 
+      document.body.scrollTop = CubicEaseInOut(frame, cur, delta, totalFrames)
+      frame++
+         
+    }, interval)
+
+    function CubicEaseInOut(t, b, c, d) {
+      // t是当前帧编号
+      // b是起始位置
+      // c表示变化量
+      // d表示总帧数
+      if ((t /= d / 2) < 1) return (c / 2) * t * t * t + b
+      return (c / 2) * ((t -= 2) * t * t + 2) + b
+    }
+
+  }
+  </script>
+</body>

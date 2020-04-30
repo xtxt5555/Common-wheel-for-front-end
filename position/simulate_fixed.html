@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    body {
+      height: 2000px;
+    }
+
+    .side {
+      background-color: yellow;
+      width: 200px;
+      height: 300px;
+      position: absolute;
+      left: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="side"></div>
+  <script>
+    // 定位的高度为scrollTop+(窗口高度 - 盒子高度) / 2
+    var box = document.getElementsByTagName('div')[0],
+        boxHeight = box.clientHeight
+
+    boxFixed(box)
+    window.onscroll = function() {
+      boxFixed(box)
+    }
+    window.onresize = function() {
+      boxFixed(box)
+    }
+
+    function boxFixed(box) {
+      var scrollTop = document.body.scrollTop || document.documentElement.scrollTop,
+        viewportHeight = document.documentElement.clientHeight
+      box.style.top = scrollTop + (viewportHeight - boxHeight) / 2 + 'px'
+    }
+    
+
+
+  </script>
+</body>

@@ -7,6 +7,11 @@
       margin: 0;
       padding: 0;
     }
+
+    /* body {
+      height: 2000px;
+    } */
+
     .text {
       width: 200px;
       height: 300px;
@@ -143,10 +148,13 @@
         content = document.getElementById('content'),
         bar = document.getElementById('bar'),
         rate = text.clientHeight / content.clientHeight,
-        barHeight = text.clientHeight * rate
+        barHeight = text.clientHeight * rate,
+        curBarTop = 0,
+        wheelStep = 20
 
     bar.style.height = barHeight + 'px'
 
+    // 模拟拖拽过程
     bar.onmousedown = function(event) {
       event = event || window.event
 
@@ -155,20 +163,60 @@
         
       document.onmousemove = function(event) {
         event = event || window.event
-        var y = event.clientY - delta
-        
-        if (y < 0) { //验收，限制滑块的运动范围
-          y = 0
-        } else if (y > text.clientHeight - bar.clientHeight) {
-          y = text.clientHeight - bar.clientHeight
+
+        // 清除原始的选取功能
+        if (event.preventDefault) {
+          event.preventDefault()
+        } else {
+          event.returnValue = false
         }
-        bar.style.top = y + 'px'
-        content.style.top = - y / rate + 'px'
+        curBarTop = event.clientY - delta
+        
+        if (curBarTop < 0) { //验收，限制滑块的运动范围
+          curBarTop = 0
+        } else if (curBarTop > text.clientHeight - bar.clientHeight) {
+          curBarTop = text.clientHeight - bar.clientHeight
+        }
+        bar.style.top = curBarTop + 'px'
+        content.style.top = - curBarTop / rate + 'px'
       }
     }
 
     document.onmouseup = function() {
       document.onmousemove = null
+    }
+  
+    // 绑定鼠标滚轮事件实现
+    content.onmousewheel = mousewheelHandler
+    //鼠标滚轮for Firefox
+    content.addEventListener('DOMMouseScroll', mousewheelHandler, false)
+
+    function mousewheelHandler(event) {
+      event = event || window.event
+      // 清除原始的鼠标滚轮造成页面滚动的效果
+      if (event.preventDefault) {
+        event.preventDefault()
+      } else {
+        event.returnValue = false
+      }
+
+      
+      var direction = 0
+      if (event.wheelDelta) {
+        direction = event.wheelDelta > 0 ? 1 : -1
+      } else if (event.detail) {
+        direction = event.detail > 0 ? -1 : 1
+      }
+
+      curBarTop += -wheelStep * direction
+      if (curBarTop < 0) { //验收，限制滑块的运动范围
+        curBarTop = 0
+      } else if (curBarTop > text.clientHeight - bar.clientHeight) {
+        curBarTop = text.clientHeight - bar.clientHeight
+      }
+      bar.style.top = curBarTop + 'px'
+      content.style.top = - curBarTop / rate + 'px'
+      
     }
   </script>
 </body>

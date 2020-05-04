@@ -29,7 +29,15 @@
       top: 0;
     }
 
-    .text .bar {
+    .text .slide {
+      position: absolute;
+      height: 100%;
+      width: 20px;
+      right: 0;
+      top: 0;
+    }
+
+    .text .slide .bar {
       background-color: greenyellow;
       position: absolute;
       width: 20px;
@@ -41,7 +49,9 @@
 </head>
 <body>
   <div class="text" id="text">
-    <div class="bar" id="bar"></div>
+    <div class="slide">
+      <div class="bar" id="bar"></div>
+    </div>
     <div class="content" id="content">
       测试文本 测试文本 测试文本 测试文本
       测试文本 测试文本 测试文本 测试文本
@@ -142,7 +152,7 @@
     </div>
   </div>
 
-  <script src="../fetchStyle.js"></script>
+  <!-- <script src="../fetchStyle.js"></script>
   <script>
     var text = document.getElementById('text'),
         content = document.getElementById('content'),
@@ -218,5 +228,58 @@
       content.style.top = - curBarTop / rate + 'px'
       
     }
+  </script> -->
+  <script src="../jquery.min.js"></script>
+  <script src="../jquery-ui.min.js"></script>
+  <script src="../jquery.mousewheel.min.js"></script>
+  <script>
+    var $bar = $('.bar'),
+        $text = $('.text'),
+        $content = $('.content'),
+        $slide = $('.slide'),
+        rate = $text.innerHeight() / $content.innerHeight(),
+        curTop = 0
+
+    $bar.css({height: $text.innerHeight() * rate})  
+
+    $bar.on('drag', function (event, ui) {
+        curTop = ui.position.top
+        $content.css({ top: -curTop / rate })
+      })
+
+    $bar.draggable({
+      axis: 'y',
+      containment: 'parent'
+    })
+
+    $text.on('mousewheel', function(event) {
+      if (event.preventDefault) {
+        event.preventDefault()
+      } else {
+        event.returnValue = false
+      }
+      curTop += -20 * event.deltaY
+      if (curTop < 0) {
+        curTop = 0
+      } else if (curTop > $text.innerHeight() - $bar.innerHeight()) {
+        curTop = $text.innerHeight() - $bar.innerHeight()
+      }
+
+      $bar.css({ top: curTop })
+      $content.css({top: -curTop / rate})
+    })
+
+    $slide.on('click', function(event) {
+      curTop = event.offsetY
+      if (curTop < 0) {
+        curTop = 0
+      } else if (curTop > $text.innerHeight() - $bar.innerHeight()) {
+        curTop = $text.innerHeight() - $bar.innerHeight()
+      }
+
+      $bar.css({ top: curTop })
+      $content.css({ top: -curTop / rate })
+    })
+    
   </script>
 </body>

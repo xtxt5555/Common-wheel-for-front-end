@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .map {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      margin: 100px auto;
+    }
+
+    .map td {
+      border: 1px solid #ccc;
+      width: 15px;
+      height: 15px;
+    }
+
+    .map td.color {
+      background-color: skyblue;
+    }
+
+    .map td.head {
+      background-color: red;
+    }
+
+    .map td.food {
+      background-color: orange;
+    }
+  </style>
+</head>
+<body>
+  <table class="map">
+    <tbody></tbody>
+  </table>
+  <script src="../jquery.min.js"></script>
+  <script>
+    var $map = $('.map'),
+        WEST = 37,
+        NORTH = 38,
+        EAST = 39,
+        SOUTH = 40,
+        actions = []
+
+    // 地图类
+    function Map(rowNum, colNum) {
+      this.rowNum = rowNum
+      this.colNum = colNum
+      this.matrix = []
+      this.init()
+    }
+
+    Map.prototype.init = function (params) {
+      $map.css({
+        'width': this.colNum * 15,
+        'height': this.rowNum * 15,
+      })
+      for (var row = 0; row < this.rowNum; row++) {
+        var $tr = $('<tr></tr>')
+        var matRow = []
+        for (var col = 0; col < this.colNum; col++) {
+          $td = $('<td></td>')
+          $tr.append($td)
+          matRow.push($td)
+        }
+        $map.append($tr)
+        this.matrix.push(matRow)
+      }
+    }
+
+    //蛇类
+    function Snake() {
+      this.body = [
+        {x: 10, y: 10},
+        {x: 10, y: 9},
+        {x: 10, y: 8},
+        {x: 10, y: 7},
+        {x: 10, y: 6}
+      ]
+      this.direction = EAST
+      this.alive = true
+      this.bindEvent()
+      this.turning = false
+    }
+
+    Snake.prototype.update = function() {
+      // 判断前进方向
+      switch(this.direction) {
+        case EAST:
+          this.body.unshift({ x: this.body[0].x, y: this.body[0].y + 1 })
+          break
+        case NORTH:
+          this.body.unshift({ x: this.body[0].x - 1, y: this.body[0].y })
+          break
+        case SOUTH:
+          this.body.unshift({ x: this.body[0].x + 1, y: this.body[0].y })
+          break
+        case WEST:
+          this.body.unshift({ x: this.body[0].x, y: this.body[0].y - 1 })
+          break
+        default:
+          return
+      }
+      this.body.pop()
+
+      // 判断食物有没有被吃
+      if (this.body[0].x === food.x && this.body[0].y === food.y) {
+        this.growUp()
+        food.change()
+      }
+
+      // 判断死亡
+      var eatSelf = false
+      for (var i = 1, len = this.body.length; i < len; i++) {
+        if (this.body[0].x === this.body[i].x && this.body[0].y === this.body[i].y) {
+          eatSelf = true
+        }
+      }
+      if (
+        this.body[0].y < 0 ||
+        this.body[0].y > map.colNum - 1 ||
+        this.body[0].x < 0 ||
+        this.body[0].x > map.rowNum - 1 ||
+        eatSelf
+      ) {
+        this.alive = false
+        clearInterval(timer)
+        console.log('You Died')
+        return
+      }
+      
+    }
+
+    Snake.prototype.render = function () {
+      //清空表格颜色
+      for (var row = 0; row < map.rowNum; row++) {
+        for (var col = 0; col < map.colNum; col++) {
+          map.matrix[row][col].removeClass()
+        }
+      }
+
+      //渲染蛇
+
+      this.alive && $.each(this.body, function(index, ele) {
+        map.matrix[ele.x][ele.y].addClass('color')
+      })
+
+      this.alive && map.matrix[this.body[0].x][this.body[0].y].addClass('head')
+
+      this.turning = false
+    }
+
+    Snake.prototype.bindEvent = function() {
+      var that = this,
+          keyCode
+      $(document).on('keydown', function(event) {
+        if (that.turning)
+          return
+        that.turning = true
+        event.preventDefault()
+        if (
+          event.keyCode === EAST && that.direction === WEST
+          ||
+          event.keyCode === NORTH && that.direction === SOUTH
+          ||
+          event.keyCode === SOUTH && that.direction === NORTH
+          ||
+          event.keyCode === WEST && that.direction === EAST
+        ) return
+
+        that.direction = event.keyCode
+      })
+    }
+
+    Snake.prototype.growUp = function() {
+      //最好增长是在尾部增长，不然在边缘迟到食物太容易死亡
+      var tailDirection,
+          lastBodyNum = this.body.length - 1,
+          lastBody = this.body[lastBodyNum],
+          last2Body = this.body[lastBodyNum - 1]
+
+          if (last2Body.y - lastBody.y > 0) {
+            tailDireciton = WEST
+          } else if (last2Body.y - lastBody.y < 0) {
+            tailDireciton = EAST
+          } else if (last2Body.x - lastBody.x > 0) {
+            tailDirection = NORTH
+          } else if (last2Body.x - lastBody.x < 0) {
+            tailDirection = SOUTH
+          }
+      switch (tailDireciton) {
+        case EAST:
+          this.body.push({ x: this.body[lastBodyNum].x, y: this.body[lastBodyNum].y + 1 })
+          break
+        case NORTH:
+          this.body.push({ x: this.body[lastBodyNum].x - 1, y: this.body[lastBodyNum].y })
+          break
+        case SOUTH:
+          this.body.push({ x: this.body[lastBodyNum].x + 1, y: this.body[lastBodyNum].y })
+          break
+        case WEST:
+          this.body.push({ x: this.body[lastBodyNum].x, y: this.body[lastBodyNum].y - 1 })
+          break
+        default:
+          return
+      }
+    }
+
+    // 食物类
+    function Food() {
+      this.change()
+    }
+
+    Food.prototype.change = function() {
+      var x = parseInt(Math.random() * map.rowNum),
+          y = parseInt(Math.random() * map.colNum)
+      this.x = NaN
+      this.y = NaN
+      for (var i = 0, len = snake.body.length; i < len; i++) {
+        if (x === snake.body[i].x && y === snake.body[i].y) {
+          this.change()
+          return
+        }
+      }
+      this.x = x
+      this.y = y
+    }
+
+    Food.prototype.render = function() {
+      !Number.isNaN(this.x) && map.matrix[this.x][this.y].addClass('food')
+    }
+    
+    
+    var map = new Map(30, 50)
+    var snake = new Snake()
+    var food = new Food()
+
+    
+
+    var timer = setInterval(function() {
+      snake.render()
+      snake.update()
+      food.render()
+    }, 60)
+
+    
+    
+  </script>
+</body>

@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "- //W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http: //www.w3.org/1999/xhtml" xml:lang="en">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <title>Document</title>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #F9F9F9;
+    }
+
+    .main {
+      width: 1099px;
+      margin: 50px auto;
+      font-family: Arial,SimSun;
+    }
+    .main .top {
+      height: 30px;
+      line-height: 30px;
+      background-color: #F9F9F9;
+      padding: 0 10px;
+    }
+
+    .main .top h3 {
+      float: left;
+    }
+
+    .main .top span {
+      float: right;
+    }
+
+    .main .tb {
+      padding: 0 10px;
+      background-color: #fff;
+      border-right: 1px solid #E5E5E5;
+      border-bottom: 1px solid #E5E5E5;
+      min-height: 600px;
+    }
+    
+    .main .tb .col {
+      float: left;
+      height: 53px;
+      font-size: 13px;
+      line-height: 53px;
+      padding-left: 20px;
+    }
+
+    .main .tb .col1 {
+      width: 290px;
+    }
+    .main .tb .col2,
+    .main .tb .col3,
+    .main .tb .col4,
+    .main .tb .col5
+    {
+      width: 160px;
+      overflow: hidden;
+    }
+
+    .main .tb .col5 .date {
+      float: left;
+    }
+
+    .main .tb .tb-row .col5 .arrow {
+      width: 20px;
+      height: 10px;
+      background: url(./banner-icon.png) no-repeat -28px -146px;
+      float: right;
+      margin-top: 22px;
+    }
+
+    .main .tb .tb-row .col5 .arrow:hover {
+      background-position-x: -81px;
+    }
+
+    .main .tb .tb-row.show .col5 .arrow {
+      background: url(./banner-icon.png) no-repeat -2px -146px;
+    }
+
+    .main .tb .tb-row.show .col5 .arrow:hover {
+      background-position-x: -54px;
+    }
+   
+    .main .tb .tb-head {
+      overflow: hidden;
+      border-bottom: 1px solid #F5F5F5;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .main .tb .tb-row {
+      border-bottom: 1px dashed #F5F5F5;
+    }
+
+    .main .tb .tb-row:last-child {
+      border-bottom: none;
+    }
+
+    .main .tb .tb-row .breif {
+      overflow: hidden;
+    }
+
+    .main .tb .tb-row .detail {
+      padding: 10px 20px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .main .tb .tb-row .detail p {
+      padding: 5px 0;
+    }
+
+    .main .tb-nav {
+      width: 372px;
+      margin: 26px auto;
+    }
+
+    .main .tb-nav ul {
+      list-style: none;
+      overflow: hidden;
+    }
+
+    .main .tb-nav ul li {
+      float: left;
+      width: 46px;
+      height: 46px;
+      line-height: 46px;
+      font-size: 16px;
+      text-align: center;
+      margin-right: 5px;
+      border-radius: 5px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    .main .tb-nav ul li.cur {
+      color: #6BBFFF;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <div class="top">
+      <h3>职位信息</h3>
+      <span>共1503个在招职位</span>
+    </div>
+    <div class="tb">
+      <div class="tb-head">
+        <div class="col col1">职位名称</div>
+        <div class="col col2">职位类别</div>
+        <div class="col col3">工作地点</div>
+        <div class="col col4">招聘人数</div>
+        <div class="col col5">更新时间</div>
+      </div>
+      <div class="tb-body"></div>
+    </div>
+    <div class="tb-nav">
+    </div>
+  </div>
+
+  <script type="text/javascript" src="../jquery.min.js"></script>
+  <script type="text/javascript" src="../lodash.min.js"></script>
+
+  <script type="text/template">
+    <div class="tb-row">
+      <div class="breif">
+        <div class="col col1"><%= name %> </div>
+          <div class="col col2"><%= postType %></div>
+          <div class="col col3"><%= workPlace %></div>
+          <div class="col col4"><%= recruitNum %></div>
+          <div class="col col5">
+            <span class="date"><%= publishDate %> </span>
+            <a class="arrow" href="javascript:void(0)"></a>
+          </div>
+        </div>
+        <div class="detail">
+          <p>工作职责：</p>
+          <p><%=  workContent%></p>
+          <p>职位要求：</p>
+          <p><%= serviceCondition %></p>
+        </div>
+      </div>
+  </script>
+
+  <script type="text/javascript">
+
+    function JobTable() {
+      var that = this
+
+      this.$dom = $('.main .tb')
+      this.jobRows = []
+      this.fetchData(1, function(data) {
+        that.render(data)
+      })
+    }
+
+    JobTable.prototype.fetchData = function(pageNum, fn) {
+      // 获得数据
+      $.get('./JSON/getPostList' + pageNum, function(JSONStr) {
+        var data = JSON.parse(JSONStr)
+        fn(data)
+      })
+    }
+
+
+    JobTable.prototype.render = function(data) {
+      var that = this
+          
+      // 创造表单
+      _.each(data.postList, function (ele, idx) {
+        that.jobRows.push(new JobRow(ele))
+      })
+
+      //创建导航条
+      console.log(data);
+      
+      that.nav = new TableNav(data.currentPage, data.totalPage)
+
+      that.nav.goto = function(newPage) {
+        that.fetchData(newPage, function(data) {
+          // 删除旧表格
+          $.each(that.jobRows, function (idx, ele) {
+            ele.delete()
+          })
+          that.jobRows = []
+
+          //删除旧导航
+          that.nav.delete()
+          that.nav = null
+
+          //重新渲染表格
+          that.render(data)
+        })
+      }
+      
+    }
+        
+    function JobRow(jobInfo) {
+      var that = this
+      this.compiled = _.template($('script[type="text/template"]').html())
+      this.domStr = this.compiled(jobInfo)
+      this.$dom = $(this.domStr)
+      this.detail = 0 // 0表示关闭，1表示开启
+
+      this.$dom.find('.arrow').click(function() {
+        if (!that.detail) {
+          that.detail = 1
+          that.$dom.addClass('show').siblings().removeClass('show')
+          that.$dom.find('.detail').stop(true).slideDown()
+        } else if (that.detail) {
+          that.detail = 0
+          that.$dom.removeClass('show')
+          that.$dom.find('.detail').stop(true).slideUp()
+        }
+      })
+      
+      this.render()
+    }
+
+    JobRow.prototype.render = function() {
+      $('.tb-body').append(this.$dom)
+    }
+
+    JobRow.prototype.delete = function () {
+      this.$dom.remove()
+    }
+
+    function TableNav(curPage, maxPage) {
+      this.$dom = $('.main .tb-nav')
+      this.curPage = curPage
+      this.maxPage = maxPage
+      this.navs = []
+      console.log(this.maxPage);
+      
+      this.render()
+    }
+
+    TableNav.prototype.render = function() {
+      var $ul = $('<ul></ul>')
+      var that = this
+
+      //按照最大页数生成按钮
+      if (this.maxPage <= 5 && this.maxPage > 0) {
+        for (var i = 1; i <= this.maxPage; i++) {
+          var $li = $('<li>' + (i + 1) + '</li>')
+          this.navs.push($li)
+          ;(function(i) {
+            $li.click(function () {
+              that.goto(i)
+            })
+          })(i)
+          $ul.append($li)
+        }
+        $ul.children().eq(this.curPage - 1).addClass('cur')
+
+      } else if (this.maxPage > 5) {
+        if (this.curPage >= 1 && this.curPage < 4) {
+          for (var i = 1; i <= 4; i++) {
+            var $li = $('<li>' + i + '</li>')
+            this.navs.push($li)
+              ;(function (i) {
+                $li.click(function () {
+                  that.goto(i)
+                })
+              })(i)
+            $ul.append($li)
+          }
+
+          $li = $('<li>...</li>')  
+          this.navs.push($li)
+          $ul.append($li)
+
+          $li = $('<li>' + (this.maxPage) + '</li>')
+          this.navs.push($li)
+          $li.click(function () {
+            that.goto(that.maxPage)
+          })
+          $ul.append($li)
+
+          $.each($ul.children(), function(idx, ele) {
+            if ($(ele).html() == that.curPage) {
+              $(ele).addClass('cur')
+            }
+          })
+          
+        } else if (this.curPage > this.maxPage - 3 && this.curPage <= this.maxPage) {
+          $li = $('<li>1</li>')
+          this.navs.push($li)
+          $li.click(function () {
+            that.goto(1)
+          })
+          $ul.append($li)
+
+          $li = $('<li>...</li>')
+          this.navs.push($li)
+          $ul.append($li)
+
+          for (var i = this.maxPage - 3; i <= this.maxPage; i++) {
+            var $li = $('<li>' + i + '</li>')
+            this.navs.push($li)
+              ;(function (i) {
+                $li.click(function () {
+                  that.goto(i)
+                })
+              })(i)
+            $ul.append($li)
+          }
+          $.each($ul.children(), function (idx, ele) {
+            if ($(ele).html() == that.curPage) {
+              $(ele).addClass('cur')
+            }
+          })
+
+        } else {
+          $li = $('<li>1</li>')
+          this.navs.push($li)
+          $li.click(function () {
+            that.goto(1)
+          })
+          $ul.append($li)
+
+          $li = $('<li>...</li>')
+          this.navs.push($li)
+          $ul.append($li)
+
+          for (var i = this.curPage - 1; i <= this.curPage + 1; i++) {
+            var $li = $('<li>' + i + '</li>')
+            this.navs.push($li)
+              ; (function (i) {
+                $li.click(function () {
+                  that.goto(i)
+                })
+              })(i)
+            $ul.append($li)
+          }
+
+          $li = $('<li>...</li>')
+          this.navs.push($li)
+          $ul.append($li)
+
+          $li = $('<li>' + (this.maxPage) + '</li>')
+          this.navs.push($li)
+          $li.click(function () {
+            that.goto(that.maxPage)
+          })
+          $ul.append($li)
+
+          $.each($ul.children(), function (idx, ele) {
+            if ($(ele).html() == that.curPage) {
+              $(ele).addClass('cur')
+            }
+          })
+          
+        }
+      }
+      $ul.appendTo(that.$dom)
+    }
+
+    TableNav.prototype.delete = function() {
+      this.$dom.children('ul').remove()
+    }
+
+    var tb = new JobTable()
+  </script>
+</body>
